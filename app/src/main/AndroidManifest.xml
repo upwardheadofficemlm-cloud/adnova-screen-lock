@@ -81,6 +81,18 @@
             </intent-filter>
         </receiver>
 
+        <!-- Schedule Receiver -->
+        <receiver
+            android:name=".service.ScheduleReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.adnova.screenlock.SCHEDULED_LOCK" />
+                <action android:name="com.adnova.screenlock.SCHEDULED_UNLOCK" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <!-- Firebase Messaging Service -->
         <service
             android:name=".service.FirebaseMessagingService"
