@@ -7,20 +7,6 @@
       "use": "@vercel/static"
     }
   ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/website/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/website/index.html"
-    },
-    {
-      "src": "/admin",
-      "dest": "/website/admin-dashboard.html"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -46,6 +32,7 @@
     "FIREBASE_PROJECT_ID": "adnova-screen-lock-90521",
     "FIREBASE_STORAGE_BUCKET": "adnova-screen-lock-90521.firebasestorage.app",
     "FIREBASE_MESSAGING_SENDER_ID": "914767381345",
-    "FIREBASE_APP_ID": "1:914767381345:android:22ee0a507344a202977b20"
+    "FIREBASE_APP_ID": "1:914767381345:android:22ee0a507344a202977b20",
+    "FIREBASE_MEASUREMENT_ID": "G-J4L3HM9L45"
   }
 }
