@@ -319,3 +319,4 @@ If you encounter issues:
 ---
 
 Your Firebase project is now configured for the AdNova Screen Lock application! 🎉
+
