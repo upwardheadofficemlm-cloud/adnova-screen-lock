@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - AdNova Screen Lock</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .api-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .api-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .api-endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-right: 1rem;
+        }
+        
+        .method.get { background: #28a745; color: white; }
+        .method.post { background: #007bff; color: white; }
+        .method.put { background: #ffc107; color: black; }
+        .method.delete { background: #dc3545; color: white; }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .parameter-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        .parameter-table th,
+        .parameter-table td {
+            border: 1px solid #dee2e6;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        
+        .parameter-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .status-code {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .status-200 { background: #d4edda; color: #155724; }
+        .status-400 { background: #f8d7da; color: #721c24; }
+        .status-401 { background: #f8d7da; color: #721c24; }
+        .status-500 { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-lock"></i>
+                <span>AdNova API Docs</span>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="admin-dashboard.html" class="nav-link">Admin</a>
+                <a href="#authentication" class="nav-link">Auth</a>
+                <a href="#devices" class="nav-link">Devices</a>
+                <a href="#configurations" class="nav-link">Configs</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="api-container">
+            <div class="page-header">
+                <h1>AdNova Screen Lock API Documentation</h1>
+                <p>Complete API reference for managing digital signage devices</p>
+            </div>
+
+            <!-- Authentication Section -->
+            <section id="authentication" class="api-section">
+                <h2><i class="fas fa-key"></i> Authentication</h2>
+                <p>All API endpoints require Firebase Authentication. Include the Firebase ID token in the Authorization header.</p>
+                
+                <div class="api-endpoint">
+                    <span class="method post">POST</span>
+                    <strong>/api/auth/login</strong>
+                    <p>Authenticate user and get Firebase ID token</p>
+                    
+                    <h4>Request Body:</h4>
+                    <div class="code-block">
+{
+  "email": "admin@upwardmm.com",
+  "password": "Upward103999@@"
+}
+                    </div>
+                    
+                    <h4>Response:</h4>
+                    <div class="code-block">
+{
+  "success": true,
+  "token": "firebase_id_token",
+  "user": {
+    "uid": "user_id",
+    "email": "admin@upwardmm.com"
+  }
+}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Devices Section -->
+            <section id="devices" class="api-section">
+                <h2><i class="fas fa-mobile-alt"></i> Device Management</h2>
+                
+                <div class="api-endpoint">
+                    <span class="method get">GET</span>
+                    <strong>/api/devices</strong>
+                    <p>Get all registered devices</p>
+                    
+                    <h4>Headers:</h4>
+                    <div class="code-block">
+Authorization: Bearer &lt;firebase_id_token&gt;
+                    </div>
+                    
+                    <h4>Response:</h4>
+                    <div class="code-block">
+{
+  "success": true,
+  "devices": [
+    {
+      "deviceId": "device_123",
+      "deviceName": "Digital Signage 1",
+      "status": "online",
+      "lastSeen": "2024-01-15T10:30:00Z",
+      "configuration": {
+        "lockType": "full",
+        "pinEnabled": true,
+        "kioskMode": false
+      }
+    }
+  ]
+}
+                    </div>
+                </div>
+
+                <div class="api-endpoint">
+                    <span class="method post">POST</span>
+                    <strong>/api/devices</strong>
+                    <p>Register a new device</p>
+                    
+                    <h4>Request Body:</h4>
+                    <div class="code-block">
+{
+  "deviceId": "device_123",
+  "deviceName": "Digital Signage 1",
+  "deviceInfo": {
+    "model": "Samsung Galaxy Tab",
+    "androidVersion": "12",
+    "appVersion": "1.0.0"
+  }
+}
+                    </div>
+                </div>
+
+                <div class="api-endpoint">
+                    <span class="method put">PUT</span>
+                    <strong>/api/devices/{deviceId}</strong>
+                    <p>Update device configuration</p>
+                    
+                    <h4>Request Body:</h4>
+                    <div class="code-block">
+{
+  "lockType": "edge",
+  "pinEnabled": true,
+  "kioskMode": true,
+  "unlockButton": {
+    "enabled": true,
+    "position": "bottom-right",
+    "tapsRequired": 3
+  }
+}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Configurations Section -->
+            <section id="configurations" class="api-section">
+                <h2><i class="fas fa-cog"></i> Configuration Management</h2>
+                
+                <div class="api-endpoint">
+                    <span class="method get">GET</span>
+                    <strong>/api/configurations</strong>
+                    <p>Get all device configurations</p>
+                    
+                    <h4>Response:</h4>
+                    <div class="code-block">
+{
+  "success": true,
+  "configurations": [
+    {
+      "id": "config_123",
+      "name": "Retail Store Config",
+      "lockType": "custom",
+      "lockAreas": [
+        {
+          "x": 100,
+          "y": 100,
+          "width": 200,
+          "height": 300
+        }
+      ],
+      "pinEnabled": true,
+      "kioskMode": false
+    }
+  ]
+}
+                    </div>
+                </div>
+
+                <div class="api-endpoint">
+                    <span class="method post">POST</span>
+                    <strong>/api/configurations</strong>
+                    <p>Create a new configuration</p>
+                    
+                    <h4>Request Body:</h4>
+                    <div class="code-block">
+{
+  "name": "Mall Kiosk Config",
+  "lockType": "full",
+  "pinEnabled": true,
+  "kioskMode": true,
+  "schedule": {
+    "enabled": true,
+    "lockTime": "22:00",
+    "unlockTime": "08:00"
+  }
+}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics" class="api-section">
+                <h2><i class="fas fa-chart-bar"></i> Analytics</h2>
+                
+                <div class="api-endpoint">
+                    <span class="method get">GET</span>
+                    <strong>/api/analytics/usage</strong>
+                    <p>Get device usage analytics</p>
+                    
+                    <h4>Query Parameters:</h4>
+                    <table class="parameter-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>deviceId</td>
+                                <td>string</td>
+                                <td>No</td>
+                                <td>Filter by specific device</td>
+                            </tr>
+                            <tr>
+                                <td>startDate</td>
+                                <td>string</td>
+                                <td>No</td>
+                                <td>Start date (YYYY-MM-DD)</td>
+                            </tr>
+                            <tr>
+                                <td>endDate</td>
+                                <td>string</td>
+                                <td>No</td>
+                                <td>End date (YYYY-MM-DD)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <h4>Response:</h4>
+                    <div class="code-block">
+{
+  "success": true,
+  "analytics": {
+    "totalDevices": 25,
+    "activeDevices": 23,
+    "totalLockEvents": 1250,
+    "averageSessionTime": "4h 32m",
+    "deviceStats": [
+      {
+        "deviceId": "device_123",
+        "lockEvents": 45,
+        "unlockEvents": 45,
+        "totalUptime": "168h"
+      }
+    ]
+  }
+}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Error Codes -->
+            <section id="errors" class="api-section">
+                <h2><i class="fas fa-exclamation-triangle"></i> Error Codes</h2>
+                
+                <table class="parameter-table">
+                    <thead>
+                        <tr>
+                            <th>Status Code</th>
+                            <th>Description</th>
+                            <th>Example Response</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="status-code status-400">400</span></td>
+                            <td>Bad Request</td>
+                            <td>Invalid request parameters</td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-code status-401">401</span></td>
+                            <td>Unauthorized</td>
+                            <td>Invalid or missing authentication token</td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-code status-404">404</span></td>
+                            <td>Not Found</td>
+                            <td>Device or configuration not found</td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-code status-500">500</span></td>
+                            <td>Internal Server Error</td>
+                            <td>Server error occurred</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- SDK Examples -->
+            <section id="sdk" class="api-section">
+                <h2><i class="fas fa-code"></i> SDK Examples</h2>
+                
+                <h3>JavaScript/Web SDK</h3>
+                <div class="code-block">
+// Initialize Firebase
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAz8P_dX5uTI3zF0lW2CwPh4yqFvwfUn2o",
+  authDomain: "adnova-screen-lock-90521.firebaseapp.com",
+  projectId: "adnova-screen-lock-90521",
+  storageBucket: "adnova-screen-lock-90521.firebasestorage.app",
+  messagingSenderId: "914767381345",
+  appId: "1:914767381345:android:22ee0a507344a202977b20"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Login
+const login = async (email, password) => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const token = await userCredential.user.getIdToken();
+    return token;
+  } catch (error) {
+    console.error('Login failed:', error);
+  }
+};
+
+// Get devices
+const getDevices = async () => {
+  const devicesRef = collection(db, 'devices');
+  const snapshot = await getDocs(devicesRef);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+};
+                </div>
+
+                <h3>Android SDK</h3>
+                <div class="code-block">
+// Kotlin example
+class DeviceManager {
+    private val firebaseAuth = FirebaseAuth.getInstance()
+    private val firestore = FirebaseFirestore.getInstance()
+    
+    fun login(email: String, password: String, callback: (String?) -> Unit) {
+        firebaseAuth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    firebaseAuth.currentUser?.getIdToken(true)
+                        ?.addOnCompleteListener { tokenTask ->
+                            if (tokenTask.isSuccessful) {
+                                callback(tokenTask.result?.token)
+                            } else {
+                                callback(null)
+                            }
+                        }
+                } else {
+                    callback(null)
+                }
+            }
+    }
+    
+    fun getDevices(callback: (List&lt;Device&gt;) -> Unit) {
+        firestore.collection("devices")
+            .get()
+            .addOnSuccessListener { result ->
+                val devices = result.documents.map { doc ->
+                    Device(doc.id, doc.data)
+                }
+                callback(devices)
+            }
+            .addOnFailureListener { exception ->
+                callback(emptyList())
+            }
+    }
+}
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Manual - AdNova Screen Lock</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .manual-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .manual-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .step-number {
+            background: #007bff;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .step-content h4 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+        }
+        
+        .step-content p {
+            margin: 0;
+            color: #666;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .feature-card h4 {
+            color: #007bff;
+            margin: 0 0 1rem 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-card h4 i {
+            margin-right: 0.5rem;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .warning-box i {
+            color: #856404;
+            margin-right: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        
+        .warning-box p {
+            margin: 0;
+            color: #856404;
+        }
+        
+        .troubleshooting-item {
+            background: #f8f9fa;
+            border-left: 4px solid #dc3545;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .troubleshooting-item h5 {
+            color: #dc3545;
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .troubleshooting-item p {
+            margin: 0;
+            color: #666;
+        }
+        
+        .code-snippet {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        
+        .table-of-contents {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .table-of-contents h3 {
+            margin: 0 0 1rem 0;
+            color: #333;
+        }
+        
+        .table-of-contents ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .table-of-contents li {
+            margin: 0.5rem 0;
+        }
+        
+        .table-of-contents a {
+            color: #007bff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .table-of-contents a:hover {
+            text-decoration: underline;
+        }
+        
+        .table-of-contents a i {
+            margin-right: 0.5rem;
+            width: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-lock"></i>
+                <span>AdNova Manual</span>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="admin-dashboard.html" class="nav-link">Admin</a>
+                <a href="api-docs.html" class="nav-link">API Docs</a>
+                <a href="#installation" class="nav-link">Installation</a>
+                <a href="#configuration" class="nav-link">Configuration</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="manual-container">
+            <div class="page-header">
+                <h1>AdNova Screen Lock - User Manual</h1>
+                <p>Complete guide for setting up and using the AdNova Screen Lock application</p>
+            </div>
+
+            <!-- Table of Contents -->
+            <div class="table-of-contents">
+                <h3><i class="fas fa-list"></i> Table of Contents</h3>
+                <ul>
+                    <li><a href="#overview"><i class="fas fa-info-circle"></i> Overview</a></li>
+                    <li><a href="#installation"><i class="fas fa-download"></i> Installation</a></li>
+                    <li><a href="#initial-setup"><i class="fas fa-cog"></i> Initial Setup</a></li>
+                    <li><a href="#lock-types"><i class="fas fa-lock"></i> Lock Types</a></li>
+                    <li><a href="#unlock-methods"><i class="fas fa-unlock"></i> Unlock Methods</a></li>
+                    <li><a href="#admin-features"><i class="fas fa-user-shield"></i> Admin Features</a></li>
+                    <li><a href="#troubleshooting"><i class="fas fa-tools"></i> Troubleshooting</a></li>
+                    <li><a href="#faq"><i class="fas fa-question-circle"></i> FAQ</a></li>
+                </ul>
+            </div>
+
+            <!-- Overview -->
+            <section id="overview" class="manual-section">
+                <h2><i class="fas fa-info-circle"></i> Overview</h2>
+                <p>AdNova Screen Lock is a professional Android application designed for digital signage devices. It provides secure screen locking capabilities with Firebase backend integration for remote management and monitoring.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4><i class="fas fa-lock"></i> Multiple Lock Types</h4>
+                        <p>Full screen, edge-based, and custom area locking options for flexible protection.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4><i class="fas fa-shield-alt"></i> PIN Protection</h4>
+                        <p>Optional PIN-based unlock system for enhanced security and parental controls.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4><i class="fas fa-cloud"></i> Firebase Integration</h4>
+                        <p>Real-time device management, configuration updates, and analytics through Firebase.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4><i class="fas fa-mobile-alt"></i> Kiosk Mode</h4>
+                        <p>Complete device lockdown with system button blocking for dedicated signage use.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Installation -->
+            <section id="installation" class="manual-section">
+                <h2><i class="fas fa-download"></i> Installation</h2>
+                
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Download the APK</h4>
+                        <p>Download the AdNova Screen Lock APK file from the official website or admin dashboard.</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Enable Unknown Sources</h4>
+                        <p>Go to Settings → Security → Unknown Sources and enable installation from unknown sources.</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Install the Application</h4>
+                        <p>Open the downloaded APK file and follow the installation prompts.</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Grant Permissions</h4>
+                        <p>The app will request necessary permissions. Grant all permissions for full functionality.</p>
+                    </div>
+                </div>
+                
+                <div class="warning-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p><strong>Important:</strong> Ensure your device meets the minimum requirements: Android 10+, 2GB RAM, 32GB storage.</p>
+                </div>
+            </section>
+
+            <!-- Initial Setup -->
+            <section id="initial-setup" class="manual-section">
+                <h2><i class="fas fa-cog"></i> Initial Setup</h2>
+                
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Launch the Application</h4>
+                        <p>Open AdNova Screen Lock from your app drawer or home screen.</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Grant Overlay Permission</h4>
+                        <p>When prompted, grant the "Display over other apps" permission. This is essential for the lock functionality.</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Configure Basic Settings</h4>
+                        <p>Set your preferred lock type, unlock method, and other basic settings in the main interface.</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Test the Lock</h4>
+                        <p>Activate the lock and test the unlock method to ensure everything works correctly.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lock Types -->
+            <section id="lock-types" class="manual-section">
+                <h2><i class="fas fa-lock"></i> Lock Types</h2>
+                
+                <h3>Full Screen Lock</h3>
+                <p>Locks the entire screen, preventing any touch input across the whole display.</p>
+                <div class="code-snippet">
+Lock Type: Full Screen
+Coverage: 100% of screen area
+Use Case: Complete device protection
+                </div>
+                
+                <h3>Edge Lock</h3>
+                <p>Locks specific edges of the screen (left, right, top, bottom) while keeping the center area accessible.</p>
+                <div class="code-snippet">
+Lock Type: Edge Lock
+Coverage: Selected edges only
+Use Case: Partial protection with center access
+                </div>
+                
+                <h3>Custom Area Lock</h3>
+                <p>Allows you to define custom rectangular areas to lock, providing precise control over protected zones.</p>
+                <div class="code-snippet">
+Lock Type: Custom Area
+Coverage: User-defined rectangles
+Use Case: Specific area protection
+                </div>
+            </section>
+
+            <!-- Unlock Methods -->
+            <section id="unlock-methods" class="manual-section">
+                <h2><i class="fas fa-unlock"></i> Unlock Methods</h2>
+                
+                <h3>Floating Unlock Button</h3>
+                <p>A floating button that appears on screen for easy unlocking. Configurable position and behavior.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4><i class="fas fa-hand-pointer"></i> Double Tap</h4>
+                        <p>Double-tap the floating button to unlock the screen.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4><i class="fas fa-mouse-pointer"></i> Tap Counter</h4>
+                        <p>Set the number of taps required on locked areas before the button appears.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4><i class="fas fa-arrows-alt"></i> Position Control</h4>
+                        <p>Choose from predefined positions or set custom coordinates for the button.</p>
+                    </div>
+                </div>
+                
+                <h3>PIN Unlock</h3>
+                <p>Optional PIN-based security for additional protection and parental controls.</p>
+                
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Enable PIN Protection</h4>
+                        <p>Go to Settings → Security → Enable PIN Protection.</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Set PIN</h4>
+                        <p>Enter a 4-8 digit PIN and confirm it.</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Test PIN Unlock</h4>
+                        <p>Lock the screen and test the PIN unlock functionality.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Admin Features -->
+            <section id="admin-features" class="manual-section">
+                <h2><i class="fas fa-user-shield"></i> Admin Features</h2>
+                
+                <h3>Remote Device Management</h3>
+                <p>Access the admin dashboard to manage all your digital signage devices remotely.</p>
+                
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Access Admin Dashboard</h4>
+                        <p>Visit the admin dashboard URL and log in with your admin credentials.</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>View Device Status</h4>
+                        <p>Monitor all registered devices, their status, and current configurations.</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Update Configurations</h4>
+                        <p>Push configuration updates to individual devices or device groups.</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>View Analytics</h4>
+                        <p>Access usage analytics, device performance metrics, and system reports.</p>
+                    </div>
+                </div>
+                
+                <h3>Kiosk Mode</h3>
+                <p>Complete device lockdown for dedicated digital signage use.</p>
+                
+                <div class="warning-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p><strong>Warning:</strong> Kiosk mode will block all system buttons and prevent users from exiting the app. Use with caution.</p>
+                </div>
+            </section>
+
+            <!-- Troubleshooting -->
+            <section id="troubleshooting" class="manual-section">
+                <h2><i class="fas fa-tools"></i> Troubleshooting</h2>
+                
+                <div class="troubleshooting-item">
+                    <h5>App won't lock the screen</h5>
+                    <p>Ensure the "Display over other apps" permission is granted. Go to Settings → Apps → AdNova Screen Lock → Permissions and enable "Display over other apps".</p>
+                </div>
+                
+                <div class="troubleshooting-item">
+                    <h5>Floating button not appearing</h5>
+                    <p>Check the tap counter settings. The button may require multiple taps on locked areas before appearing. Also verify the button position settings.</p>
+                </div>
+                
+                <div class="troubleshooting-item">
+                    <h5>PIN unlock not working</h5>
+                    <p>Verify that PIN protection is enabled in settings. If you forgot your PIN, you may need to reset the app data or contact your administrator.</p>
+                </div>
+                
+                <div class="troubleshooting-item">
+                    <h5>Firebase connection issues</h5>
+                    <p>Check your internet connection and ensure the device can reach Firebase services. Verify that the Firebase configuration is correct.</p>
+                </div>
+                
+                <div class="troubleshooting-item">
+                    <h5>App crashes on startup</h5>
+                    <p>Ensure your device meets the minimum requirements (Android 10+, 2GB RAM). Try clearing the app data and cache, then reconfigure the settings.</p>
+                </div>
+            </section>
+
+            <!-- FAQ -->
+            <section id="faq" class="manual-section">
+                <h2><i class="fas fa-question-circle"></i> Frequently Asked Questions</h2>
+                
+                <h3>Q: Can I use this app on tablets and phones?</h3>
+                <p>A: Yes, AdNova Screen Lock works on both Android tablets and phones running Android 10 or higher.</p>
+                
+                <h3>Q: Is the app free to use?</h3>
+                <p>A: The basic version is free. Premium features and enterprise management require a subscription.</p>
+                
+                <h3>Q: Can I manage multiple devices from one admin account?</h3>
+                <p>A: Yes, the admin dashboard allows you to manage unlimited devices from a single account.</p>
+                
+                <h3>Q: What happens if I forget my PIN?</h3>
+                <p>A: Contact your system administrator or reset the app data (this will require reconfiguration).</p>
+                
+                <h3>Q: Can the app work offline?</h3>
+                <p>A: Basic locking functionality works offline, but remote management and analytics require an internet connection.</p>
+                
+                <h3>Q: Is my data secure?</h3>
+                <p>A: Yes, all data is encrypted and stored securely using Firebase's enterprise-grade security.</p>
+            </section>
+
+            <!-- Support -->
+            <section id="support" class="manual-section">
+                <h2><i class="fas fa-life-ring"></i> Support</h2>
+                <p>For additional support and assistance:</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4><i class="fas fa-envelope"></i> Email Support</h4>
+                        <p>Contact us at support@adnova.com for technical assistance.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4><i class="fas fa-book"></i> Documentation</h4>
+                        <p>Visit our API documentation for developers and advanced users.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4><i class="fas fa-comments"></i> Community</h4>
+                        <p>Join our community forum for tips, tricks, and user discussions.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4><i class="fas fa-video"></i> Video Tutorials</h4>
+                        <p>Watch our video tutorials for step-by-step setup guides.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
