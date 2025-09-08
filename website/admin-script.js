@@ -17,6 +17,8 @@ const db = firebase.firestore();
 let currentUser = null;
 let devices = [];
 let configurations = [];
+let realTimeListeners = [];
+let deviceStatusInterval = null;
 
 // DOM Elements
 const navLinks = document.querySelectorAll('.nav-link');
@@ -29,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeDashboard();
     setupNavigation();
     loadDashboardData();
+    startRealTimeListeners();
 });
 
 // Authentication
@@ -580,3 +583,306 @@ const notificationStyles = `
 const styleSheet = document.createElement('style');
 styleSheet.textContent = notificationStyles;
 document.head.appendChild(styleSheet);
+
+// Real-time Device Management Functions
+
+/**
+ * Start real-time listeners for device updates
+ */
+function startRealTimeListeners() {
+    if (!currentUser) return;
+    
+    console.log('Starting real-time listeners...');
+    
+    // Listen for device updates
+    const devicesListener = db.collection('devices')
+        .onSnapshot((snapshot) => {
+            console.log('Devices updated:', snapshot.docs.length);
+            devices = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            updateDevicesDisplay();
+            updateDashboardStats();
+        }, (error) => {
+            console.error('Error listening to devices:', error);
+        });
+    
+    realTimeListeners.push(devicesListener);
+    
+    // Listen for commands
+    const commandsListener = db.collection('commands')
+        .onSnapshot((snapshot) => {
+            console.log('Commands updated:', snapshot.docs.length);
+            updateCommandsDisplay(snapshot.docs);
+        }, (error) => {
+            console.error('Error listening to commands:', error);
+        });
+    
+    realTimeListeners.push(commandsListener);
+    
+    // Start device status monitoring
+    startDeviceStatusMonitoring();
+}
+
+/**
+ * Start device status monitoring
+ */
+function startDeviceStatusMonitoring() {
+    deviceStatusInterval = setInterval(() => {
+        updateDeviceStatuses();
+    }, 30000); // Check every 30 seconds
+}
+
+/**
+ * Update device statuses based on last seen time
+ */
+function updateDeviceStatuses() {
+    const now = new Date();
+    const offlineThreshold = 2 * 60 * 1000; // 2 minutes
+    
+    devices.forEach(device => {
+        const lastSeen = device.lastSeen?.toDate();
+        if (lastSeen) {
+            const timeDiff = now - lastSeen;
+            const isOnline = timeDiff < offlineThreshold;
+            
+            if (device.status !== (isOnline ? 'online' : 'offline')) {
+                // Update device status in Firestore
+                db.collection('devices').doc(device.id).update({
+                    status: isOnline ? 'online' : 'offline'
+                });
+            }
+        }
+    });
+}
+
+/**
+ * Send remote command to device
+ */
+async function sendRemoteCommand(deviceId, command, parameters = {}) {
+    try {
+        const commandData = {
+            deviceId: deviceId,
+            command: command,
+            parameters: parameters,
+            status: 'pending',
+            createdAt: new Date(),
+            sentBy: currentUser.uid
+        };
+        
+        const docRef = await db.collection('commands').add(commandData);
+        console.log('Command sent:', docRef.id);
+        
+        showNotification(`Command sent to device ${deviceId}`, 'success');
+        
+        // Auto-remove command after 5 minutes
+        setTimeout(() => {
+            db.collection('commands').doc(docRef.id).delete();
+        }, 5 * 60 * 1000);
+        
+        return docRef.id;
+    } catch (error) {
+        console.error('Error sending command:', error);
+        showNotification('Failed to send command', 'error');
+    }
+}
+
+/**
+ * Lock device remotely
+ */
+async function lockDevice(deviceId, lockType = 'full', duration = null) {
+    const parameters = {
+        lockType: lockType,
+        duration: duration
+    };
+    
+    await sendRemoteCommand(deviceId, 'lock_screen', parameters);
+}
+
+/**
+ * Unlock device remotely
+ */
+async function unlockDevice(deviceId) {
+    await sendRemoteCommand(deviceId, 'unlock_screen');
+}
+
+/**
+ * Update device configuration remotely
+ */
+async function updateDeviceConfig(deviceId, config) {
+    const parameters = {
+        config: config
+    };
+    
+    await sendRemoteCommand(deviceId, 'update_config', parameters);
+}
+
+/**
+ * Restart device app remotely
+ */
+async function restartDevice(deviceId) {
+    await sendRemoteCommand(deviceId, 'restart_app');
+}
+
+/**
+ * Take screenshot of device remotely
+ */
+async function takeDeviceScreenshot(deviceId) {
+    await sendRemoteCommand(deviceId, 'take_screenshot');
+}
+
+/**
+ * Update devices display with real-time data
+ */
+function updateDevicesDisplay() {
+    const devicesContainer = document.getElementById('devicesList');
+    if (!devicesContainer) return;
+    
+    devicesContainer.innerHTML = '';
+    
+    devices.forEach(device => {
+        const deviceCard = createDeviceCard(device);
+        devicesContainer.appendChild(deviceCard);
+    });
+}
+
+/**
+ * Create device card with real-time controls
+ */
+function createDeviceCard(device) {
+    const card = document.createElement('div');
+    card.className = 'device-card';
+    card.innerHTML = `
+        <div class="device-header">
+            <div class="device-info">
+                <h3>${device.deviceName || 'Unknown Device'}</h3>
+                <p class="device-id">ID: ${device.id}</p>
+            </div>
+            <div class="device-status">
+                <span class="status-indicator ${device.status}"></span>
+                <span class="status-text">${device.status}</span>
+            </div>
+        </div>
+        
+        <div class="device-details">
+            <div class="detail-row">
+                <label>Model:</label>
+                <span>${device.model || 'Unknown'}</span>
+            </div>
+            <div class="detail-row">
+                <label>Android Version:</label>
+                <span>${device.androidVersion || 'Unknown'}</span>
+            </div>
+            <div class="detail-row">
+                <label>Last Seen:</label>
+                <span>${formatLastSeen(device.lastSeen)}</span>
+            </div>
+            <div class="detail-row">
+                <label>Battery:</label>
+                <span>${device.batteryLevel || 'Unknown'}% ${device.isCharging ? '(Charging)' : ''}</span>
+            </div>
+        </div>
+        
+        <div class="device-actions">
+            <button class="btn btn-primary" onclick="lockDevice('${device.id}')">
+                <i class="fas fa-lock"></i> Lock
+            </button>
+            <button class="btn btn-secondary" onclick="unlockDevice('${device.id}')">
+                <i class="fas fa-unlock"></i> Unlock
+            </button>
+            <button class="btn btn-warning" onclick="takeDeviceScreenshot('${device.id}')">
+                <i class="fas fa-camera"></i> Screenshot
+            </button>
+            <button class="btn btn-danger" onclick="restartDevice('${device.id}')">
+                <i class="fas fa-redo"></i> Restart
+            </button>
+        </div>
+    `;
+    
+    return card;
+}
+
+/**
+ * Format last seen time
+ */
+function formatLastSeen(lastSeen) {
+    if (!lastSeen) return 'Never';
+    
+    const date = lastSeen.toDate();
+    const now = new Date();
+    const diff = now - date;
+    
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+    return `${Math.floor(diff / 86400000)}d ago`;
+}
+
+/**
+ * Update commands display
+ */
+function updateCommandsDisplay(commandDocs) {
+    const commandsContainer = document.getElementById('commandsList');
+    if (!commandsContainer) return;
+    
+    commandsContainer.innerHTML = '';
+    
+    commandDocs.forEach(doc => {
+        const command = { id: doc.id, ...doc.data() };
+        const commandItem = createCommandItem(command);
+        commandsContainer.appendChild(commandItem);
+    });
+}
+
+/**
+ * Create command item
+ */
+function createCommandItem(command) {
+    const item = document.createElement('div');
+    item.className = `command-item ${command.status}`;
+    item.innerHTML = `
+        <div class="command-info">
+            <h4>${command.command}</h4>
+            <p>Device: ${command.deviceId}</p>
+            <p>Status: ${command.status}</p>
+            <p>Sent: ${formatLastSeen(command.createdAt)}</p>
+        </div>
+        <div class="command-actions">
+            <button class="btn btn-sm btn-danger" onclick="cancelCommand('${command.id}')">
+                Cancel
+            </button>
+        </div>
+    `;
+    
+    return item;
+}
+
+/**
+ * Cancel command
+ */
+async function cancelCommand(commandId) {
+    try {
+        await db.collection('commands').doc(commandId).delete();
+        showNotification('Command cancelled', 'success');
+    } catch (error) {
+        console.error('Error cancelling command:', error);
+        showNotification('Failed to cancel command', 'error');
+    }
+}
+
+/**
+ * Clean up real-time listeners
+ */
+function cleanupRealTimeListeners() {
+    realTimeListeners.forEach(listener => listener());
+    realTimeListeners = [];
+    
+    if (deviceStatusInterval) {
+        clearInterval(deviceStatusInterval);
+        deviceStatusInterval = null;
+    }
+}
+
+// Clean up on page unload
+window.addEventListener('beforeunload', cleanupRealTimeListeners);

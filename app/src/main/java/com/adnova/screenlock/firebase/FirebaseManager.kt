@@ -6,13 +6,18 @@ import com.adnova.screenlock.data.LockConfiguration
 import com.adnova.screenlock.data.PreferencesManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
+import android.os.Build
+import android.provider.Settings
 
 class FirebaseManager(private val context: Context) {
     
@@ -21,6 +26,11 @@ class FirebaseManager(private val context: Context) {
     private val remoteConfig = FirebaseRemoteConfig.getInstance()
     private val storage = FirebaseStorage.getInstance()
     private val preferencesManager = PreferencesManager(context)
+    private val messaging = FirebaseMessaging.getInstance()
+    
+    // Real-time listeners
+    private var deviceListener: ListenerRegistration? = null
+    private var configListener: ListenerRegistration? = null
     
     companion object {
         private const val TAG = "FirebaseManager"
@@ -219,5 +229,327 @@ class FirebaseManager(private val context: Context) {
             Log.e(TAG, "Failed to upload device configuration", e)
             false
         }
+    }
+    
+    // Enhanced Device Connection and Real-time Features
+    
+    /**
+     * Register device with enhanced information and real-time connection
+     */
+    suspend fun registerDeviceWithRealTime(): Boolean {
+        return try {
+            val deviceId = getOrCreateDeviceId()
+            val deviceInfo = getDeviceInfo()
+            val fcmToken = getFCMToken()
+            
+            val deviceData = mapOf(
+                "deviceId" to deviceId,
+                "deviceName" to deviceInfo["deviceName"],
+                "model" to deviceInfo["model"],
+                "androidVersion" to deviceInfo["androidVersion"],
+                "appVersion" to deviceInfo["appVersion"],
+                "fcmToken" to fcmToken,
+                "status" to "online",
+                "lastSeen" to Date(),
+                "registeredAt" to Date(),
+                "batteryLevel" to getBatteryLevel(),
+                "isCharging" to isDeviceCharging(),
+                "screenResolution" to getScreenResolution(),
+                "ramTotal" to getTotalRAM(),
+                "storageTotal" to getTotalStorage(),
+                "networkType" to getNetworkType()
+            )
+            
+            firestore.collection(COLLECTION_DEVICES)
+                .document(deviceId)
+                .set(deviceData)
+                .await()
+            
+            // Start real-time listeners
+            startRealTimeListeners()
+            
+            Log.d(TAG, "Device registered with real-time connection")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to register device", e)
+            false
+        }
+    }
+    
+    /**
+     * Start real-time listeners for device updates
+     */
+    fun startRealTimeListeners() {
+        val deviceId = preferencesManager.getDeviceId() ?: return
+        
+        // Listen for configuration changes
+        configListener = firestore.collection(COLLECTION_DEVICES)
+            .document(deviceId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e(TAG, "Error listening to device updates", error)
+                    return@addSnapshotListener
+                }
+                
+                snapshot?.let { doc ->
+                    if (doc.exists()) {
+                        val data = doc.data
+                        data?.let { handleDeviceUpdate(it) }
+                    }
+                }
+            }
+        
+        // Listen for remote commands
+        firestore.collection("commands")
+            .whereEqualTo("deviceId", deviceId)
+            .whereEqualTo("status", "pending")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e(TAG, "Error listening to commands", error)
+                    return@addSnapshotListener
+                }
+                
+                snapshot?.documents?.forEach { doc ->
+                    handleRemoteCommand(doc.id, doc.data)
+                }
+            }
+    }
+    
+    /**
+     * Stop real-time listeners
+     */
+    fun stopRealTimeListeners() {
+        deviceListener?.remove()
+        configListener?.remove()
+        deviceListener = null
+        configListener = null
+    }
+    
+    /**
+     * Update device status (online/offline)
+     */
+    suspend fun updateDeviceStatus(status: String) {
+        try {
+            val deviceId = preferencesManager.getDeviceId() ?: return
+            val updateData = mapOf(
+                "status" to status,
+                "lastSeen" to Date(),
+                "batteryLevel" to getBatteryLevel(),
+                "isCharging" to isDeviceCharging()
+            )
+            
+            firestore.collection(COLLECTION_DEVICES)
+                .document(deviceId)
+                .update(updateData)
+                .await()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to update device status", e)
+        }
+    }
+    
+    /**
+     * Send device heartbeat
+     */
+    suspend fun sendHeartbeat() {
+        try {
+            val deviceId = preferencesManager.getDeviceId() ?: return
+            val heartbeatData = mapOf(
+                "lastHeartbeat" to Date(),
+                "batteryLevel" to getBatteryLevel(),
+                "isCharging" to isDeviceCharging(),
+                "status" to "online"
+            )
+            
+            firestore.collection(COLLECTION_DEVICES)
+                .document(deviceId)
+                .update(heartbeatData)
+                .await()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to send heartbeat", e)
+        }
+    }
+    
+    /**
+     * Get FCM token for push notifications
+     */
+    private suspend fun getFCMToken(): String? {
+        return try {
+            messaging.token.await()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get FCM token", e)
+            null
+        }
+    }
+    
+    /**
+     * Get comprehensive device information
+     */
+    private fun getDeviceInfo(): Map<String, String> {
+        return mapOf(
+            "deviceName" to "${Build.MANUFACTURER} ${Build.MODEL}",
+            "model" to Build.MODEL,
+            "androidVersion" to Build.VERSION.RELEASE,
+            "appVersion" to "1.0.0", // You can get this from BuildConfig
+            "sdkVersion" to Build.VERSION.SDK_INT.toString(),
+            "manufacturer" to Build.MANUFACTURER,
+            "brand" to Build.BRAND,
+            "deviceId" to Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+        )
+    }
+    
+    /**
+     * Get or create unique device ID
+     */
+    private fun getOrCreateDeviceId(): String {
+        var deviceId = preferencesManager.getDeviceId()
+        if (deviceId == null) {
+            deviceId = "device_${System.currentTimeMillis()}_${Build.MODEL.replace(" ", "_")}"
+            preferencesManager.setDeviceId(deviceId)
+        }
+        return deviceId
+    }
+    
+    /**
+     * Handle device updates from Firebase
+     */
+    private fun handleDeviceUpdate(data: Map<String, Any>) {
+        try {
+            // Handle configuration updates
+            data["configuration"]?.let { configData ->
+                if (configData is Map<*, *>) {
+                    val config = com.adnova.screenlock.utils.JsonUtils.fromJson(
+                        configData.toString(), 
+                        LockConfiguration::class.java
+                    )
+                    config?.let { 
+                        preferencesManager.saveLockConfiguration(it)
+                        // Notify UI about configuration change
+                        notifyConfigurationChanged(it)
+                    }
+                }
+            }
+            
+            // Handle remote commands
+            data["remoteCommand"]?.let { command ->
+                if (command is Map<*, *>) {
+                    handleRemoteCommand("", command)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error handling device update", e)
+        }
+    }
+    
+    /**
+     * Handle remote commands from admin
+     */
+    private fun handleRemoteCommand(commandId: String, commandData: Map<String, Any>) {
+        try {
+            val command = commandData["command"] as? String
+            val parameters = commandData["parameters"] as? Map<String, Any>
+            
+            when (command) {
+                "lock_screen" -> {
+                    // Trigger screen lock
+                    notifyRemoteLockCommand(parameters)
+                }
+                "unlock_screen" -> {
+                    // Trigger screen unlock
+                    notifyRemoteUnlockCommand(parameters)
+                }
+                "update_config" -> {
+                    // Update configuration
+                    parameters?.let { notifyConfigUpdate(it) }
+                }
+                "restart_app" -> {
+                    // Restart application
+                    notifyRestartCommand()
+                }
+                "take_screenshot" -> {
+                    // Take and upload screenshot
+                    notifyScreenshotCommand()
+                }
+            }
+            
+            // Mark command as processed
+            if (commandId.isNotEmpty()) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    markCommandAsProcessed(commandId)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error handling remote command", e)
+        }
+    }
+    
+    /**
+     * Mark command as processed
+     */
+    private suspend fun markCommandAsProcessed(commandId: String) {
+        try {
+            firestore.collection("commands")
+                .document(commandId)
+                .update("status", "processed", "processedAt", Date())
+                .await()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to mark command as processed", e)
+        }
+    }
+    
+    // Device information helper methods
+    private fun getBatteryLevel(): Int {
+        // Implementation would require BatteryManager
+        return 85 // Placeholder
+    }
+    
+    private fun isDeviceCharging(): Boolean {
+        // Implementation would require BatteryManager
+        return false // Placeholder
+    }
+    
+    private fun getScreenResolution(): String {
+        val displayMetrics = context.resources.displayMetrics
+        return "${displayMetrics.widthPixels}x${displayMetrics.heightPixels}"
+    }
+    
+    private fun getTotalRAM(): Long {
+        // Implementation would require ActivityManager
+        return 2048 * 1024 * 1024 // 2GB placeholder
+    }
+    
+    private fun getTotalStorage(): Long {
+        // Implementation would require StatFs
+        return 32 * 1024 * 1024 * 1024 // 32GB placeholder
+    }
+    
+    private fun getNetworkType(): String {
+        // Implementation would require ConnectivityManager
+        return "WiFi" // Placeholder
+    }
+    
+    // Notification callbacks (to be implemented by UI)
+    private fun notifyConfigurationChanged(config: LockConfiguration) {
+        // This would be implemented with a callback interface
+        Log.d(TAG, "Configuration changed: ${config.lockType}")
+    }
+    
+    private fun notifyRemoteLockCommand(parameters: Map<String, Any>?) {
+        Log.d(TAG, "Remote lock command received")
+    }
+    
+    private fun notifyRemoteUnlockCommand(parameters: Map<String, Any>?) {
+        Log.d(TAG, "Remote unlock command received")
+    }
+    
+    private fun notifyConfigUpdate(parameters: Map<String, Any>) {
+        Log.d(TAG, "Config update received: $parameters")
+    }
+    
+    private fun notifyRestartCommand() {
+        Log.d(TAG, "Restart command received")
+    }
+    
+    private fun notifyScreenshotCommand() {
+        Log.d(TAG, "Screenshot command received")
     }
 }
