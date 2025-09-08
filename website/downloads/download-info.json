@@ -1,0 +1,55 @@
+{
+  "version": "1.0.0",
+  "buildDate": "2024-01-15T10:30:00Z",
+  "fileSize": "15.2 MB",
+  "downloads": {
+    "latest": {
+      "url": "AdNovaScreenLock-v1.0.0.apk",
+      "version": "1.0.0",
+      "type": "stable",
+      "size": "15.2 MB",
+      "description": "Latest stable release with all features"
+    },
+    "beta": {
+      "url": "AdNovaScreenLock-beta.apk",
+      "version": "1.0.0-beta",
+      "type": "beta",
+      "size": "15.2 MB",
+      "description": "Beta version with latest features and improvements"
+    }
+  },
+  "requirements": {
+    "minAndroid": "10.0",
+    "minRam": "2GB",
+    "minStorage": "32GB",
+    "permissions": [
+      "SYSTEM_ALERT_WINDOW",
+      "RECEIVE_BOOT_COMPLETED",
+      "ACCESS_NETWORK_STATE",
+      "BIND_DEVICE_ADMIN"
+    ]
+  },
+  "features": [
+    "Full screen locking",
+    "Edge-based locking",
+    "Custom area locking",
+    "PIN protection",
+    "Kiosk mode",
+    "Firebase integration",
+    "Real-time device management",
+    "Admin dashboard",
+    "Remote control",
+    "Push notifications"
+  ],
+  "changelog": {
+    "1.0.0": [
+      "Initial release",
+      "Full screen locking capabilities",
+      "Firebase backend integration",
+      "Admin dashboard",
+      "Real-time device management",
+      "PIN protection",
+      "Kiosk mode support"
+    ]
+  }
+}
