@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap>
+    <entry>
+        <key>lock_configuration</key>
+        <value>{"lockType":"FULL_SCREEN","floatingButtonEnabled":true,"doubleTapUnlock":true,"tapsToReveal":3,"pinUnlockEnabled":false,"blockIconEnabled":true,"animationEnabled":true,"volumeButtonLock":false,"autoLockOnBoot":false,"kioskMode":false}</value>
+    </entry>
+    <entry>
+        <key>max_unlock_attempts</key>
+        <value>5</value>
+    </entry>
+    <entry>
+        <key>lock_timeout_minutes</key>
+        <value>0</value>
+    </entry>
+    <entry>
+        <key>enable_analytics</key>
+        <value>true</value>
+    </entry>
+</defaultsMap>
