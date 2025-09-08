@@ -7,6 +7,12 @@
       "use": "@vercel/static"
     }
   ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/website/$1"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
