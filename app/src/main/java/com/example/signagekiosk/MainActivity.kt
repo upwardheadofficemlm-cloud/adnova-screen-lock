@@ -7,6 +7,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.signagekiosk.kiosk.KioskManager
 import com.example.signagekiosk.data.DeviceRegistrar
+import com.example.signagekiosk.overlay.TouchLockOverlayService
 
 class MainActivity : AppCompatActivity() {
     private lateinit var kioskManager: KioskManager
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
         kioskManager.ensureLockTask(this)
         DeviceRegistrar.register(this)
         // Start overlay disabled by default; cloud can enable.
+        startService(Intent(this, TouchLockOverlayService::class.java))
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
