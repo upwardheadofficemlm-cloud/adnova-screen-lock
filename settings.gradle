@@ -1,3 +1,5 @@
+rootProject.name = "SignageKiosk"
+include(":app")
 pluginManagement {
     repositories {
         google()

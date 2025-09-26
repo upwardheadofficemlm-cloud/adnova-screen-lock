@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">SignageKiosk</string>
+    <string name="locked_touch">Touch is locked</string>
+    <string name="enter_pin">Enter PIN</string>
+    <string name="unlock">Unlock</string>
+    <string name="invalid_pin">Invalid PIN</string>
+    <string name="kiosk_running">Signage kiosk is running</string>
+    <string name="pin_hint">PIN</string>
+</resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
     <string name="app_name">AdNova Screen Lock</string>
     
     <!-- Main Activity -->
