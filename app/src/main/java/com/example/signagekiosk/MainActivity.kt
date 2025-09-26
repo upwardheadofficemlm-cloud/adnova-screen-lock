@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.signagekiosk.kiosk.KioskManager
+import com.example.signagekiosk.data.DeviceRegistrar
 
 class MainActivity : AppCompatActivity() {
     private lateinit var kioskManager: KioskManager
@@ -15,6 +16,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         kioskManager = KioskManager(this)
         kioskManager.ensureLockTask(this)
+        DeviceRegistrar.register(this)
         // Start overlay disabled by default; cloud can enable.
     }
 

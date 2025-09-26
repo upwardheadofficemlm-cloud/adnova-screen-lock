@@ -4,6 +4,7 @@ import android.content.Intent
 import com.example.signagekiosk.kiosk.KioskManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.example.signagekiosk.data.DeviceRegistrar
 
 class SignageFirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
@@ -21,7 +22,7 @@ class SignageFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     override fun onNewToken(token: String) {
-        // TODO: upload token to Firestore with device ID
+        DeviceRegistrar.updateToken(applicationContext, token)
         super.onNewToken(token)
     }
 }
